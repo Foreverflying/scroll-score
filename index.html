@@ -267,7 +267,7 @@ class ScorePlayer {
     constructor(container) {
         this._container = container;
     }
-    createPage() {
+    createPage(pageUrls) {
         const padding = `${window.innerHeight / 2 - 30}px`;
         this._container.style.paddingTop = padding;
         this._container.style.paddingBottom = padding;
@@ -343,7 +343,7 @@ const pageUrls = [
 const container = document.getElementById('container');
 const player = new ScorePlayer(container)
 window.onload = () => {
-    player.createPage()
+    player.createPage(pageUrls)
 }
 
 document.onclick = () => {
