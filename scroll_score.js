@@ -1,18 +1,9 @@
-<!DOCTYPE html>
-<html class="" lang="en">
-<meta charset="utf-8">
-<!-- <body style="overflow-y:hidden;">
-<div id="container" style="overflow-y:hidden; width:100%;"> -->
-<body>
-<div id="show" style="float: left;"></div>
-<div id="container"></div>
-</body>
-
-<script>
 "use strict";
+
 const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
+
 class BarInfo {
     constructor(lineInfo) {
         this.lineInfo = lineInfo;
@@ -50,6 +41,7 @@ class BarInfo {
         return this._beatsPerMinute || this.lineInfo.pageInfo.scoreInfo.beatsPerMinute;
     }
 }
+
 class LineInfo {
     constructor(pageInfo) {
         this.pageInfo = pageInfo;
@@ -110,6 +102,7 @@ class LineInfo {
         return ret;
     }
 }
+
 class PageInfo {
     constructor(scoreInfo, urls) {
         this.scoreInfo = scoreInfo;
@@ -162,6 +155,7 @@ class PageInfo {
         return this._linesInPage || this.scoreInfo.linesInPage;
     }
 }
+
 class ScoreInfo {
     constructor(pagesUrls, linesInPage, barsInLine, barBeats, beatsPerMinute) {
         this._linesInPage = linesInPage;
@@ -262,7 +256,9 @@ class ScoreInfo {
         return this._beatsPerMinute;
     }
 }
+
 const preventScroll = (e) => e.preventDefault();
+
 class ScorePlayer {
     constructor(container) {
         this._container = container;
@@ -273,6 +269,10 @@ class ScorePlayer {
         this._container.style.paddingBottom = padding;
         for (let i = 0; i < pageUrls.length; i++) {
             const div = document.createElement('div');
+            div.style.textAlign = "center";
+            div.style.display = "flex";
+            div.style.flexWrap = "nowrap";
+            div.style.justifyContent = "center";
             this._container.appendChild(div);
             for (let j = 0; j < pageUrls[i].length; j++) {
                 const image = document.createElement('img');
@@ -292,11 +292,17 @@ class ScorePlayer {
             return true;
         }
         window.addEventListener('wheel', preventScroll, { passive: false });
+        const startScrollPos = window.scrollY;
         let pos = 0;
         const scrollInterval = 50;
         this._playContext = score.startPlay(async (context, bar) => {
             const pageHeight = this._container.children[context.pageAt].offsetHeight;
             const lineHeight = pageHeight / bar.lineInfo.pageInfo.linesInPage;
+            if (pos <= startScrollPos) {
+                const beatHeight = lineHeight * context.currentBeatMilSeconds / context.lineTotalMilSeconds;
+                pos += beatHeight;
+                return;
+            }
             const start = new Date().getTime();
             let leftMilSeconds = context.currentBeatMilSeconds;
             let delta = 0;
@@ -329,34 +335,3 @@ class ScorePlayer {
         return !!this._playContext;
     }
 }
-
-const pageUrls = [
-    ['z/1.jpg', 'z/2.jpg'],
-    ['z/3.jpg', 'z/4.jpg'],
-    ['z/5.jpg', 'z/6.jpg'],
-    ['z/7.jpg', 'z/8.jpg'],
-    ['z/9.jpg', 'z/10.jpg'],
-    ['z/11.jpg', 'z/12.jpg'],
-    ['z/13.jpg', 'z/14.jpg']
-];
-
-const container = document.getElementById('container');
-const player = new ScorePlayer(container)
-window.onload = () => {
-    player.createPage(pageUrls)
-}
-
-document.onclick = () => {
-    const score = new ScoreInfo(pageUrls, 5, 4, 8, 130);
-    score.setLineInfo(3, [2, 5], [3, 1]);
-    score.setLineInfo(2, [3, 2], [3, 3]);
-    score.setLineInfo(3, [3, 4]);
-    score.setLineInfo(2, [3, 5], [4, 1]);
-    score.setLineInfo(3, [4, 2], [6, 2]);
-    score.setLineInfo(5, [6, 5], [7, 2]);
-    score.setLineInfo(2, [7, 4]);
-    score.setLineInfo(3, [7, 5]);
-    score.setBarInfo(0, 120, [4, 1, 2], [7, 5, 3])
-    player.togglePlay(score);
-}
-</script>

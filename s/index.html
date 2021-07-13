@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html class="" lang="en">
+<meta charset="utf-8">
+<!-- <body style="overflow-y:hidden;">
+<div id="container" style="overflow-y:hidden; width:100%;"> -->
+<body>
+<div id="show" style="float: left;"></div>
+<div id="container"></div>
+</body>
+
+<script src="../scroll_score.js"></script>
+
+<script>
+// import { ScoreInfo, ScorePlayer } from './scroll_score'
+
+const pageUrls = [
+    ['1.jpg'],
+    ['2.jpg'],
+    ['3.jpg'],
+    ['4.jpg'],
+    ['5.jpg'],
+    ['6.jpg']
+];
+
+const container = document.getElementById('container');
+const player = new ScorePlayer(container)
+window.onload = () => {
+    player.createPage(pageUrls)
+}
+
+document.onclick = () => {
+    const score = new ScoreInfo(pageUrls, 6, 4, 4, 130);
+    score.setLineInfo(1, [1, 1]);
+    score.setLineInfo(3, [2, 4], [2, 5]);
+    score.setLineInfo(6, [3, 6], [6, 5]);
+    score.setLineInfo(8, [6, 6]);
+    score.setBarInfo(3, 100, [3, 6, 1], [6, 6, 8])
+    player.togglePlay(score);
+}
+</script>

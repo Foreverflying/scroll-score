@@ -324,11 +324,14 @@ class ScorePlayer {
     }
 
     createPage(pageUrls: string[][]) {
-        const padding = `${document.body.clientHeight / 2 - 100}px`
+        const padding = `${document.body.clientHeight / 2 - 30}px`
         this._container.style.paddingTop = padding
         this._container.style.paddingBottom = padding
         for (let i = 0; i < pageUrls.length; i++) {
             const div = document.createElement('div')
+            div.style.display = "flex"
+            div.style.flexWrap = "nowrap"
+            div.style.justifyContent = "center"
             this._container.appendChild(div)
             for (let j = 0; j < pageUrls[i].length; j++) {
                 const image = document.createElement('img')
@@ -349,11 +352,17 @@ class ScorePlayer {
             return true
         }
         window.addEventListener('wheel', preventScroll, { passive: false })
+        const startScrollPos = window.scrollY
         let pos = 0
         const scrollInterval = 50
         this._playContext = score.startPlay(async (context, bar) => {
             const pageHeight = (this._container.children[context.pageAt] as HTMLElement).offsetHeight
             const lineHeight = pageHeight / bar.lineInfo.pageInfo.linesInPage
+            if (pos + lineHeight <= startScrollPos) {
+                const beatHeight = lineHeight * context.currentBeatMilSeconds / context.lineTotalMilSeconds
+                pos += beatHeight
+                return
+            }
             const start = new Date().getTime()
             let leftMilSeconds = context.currentBeatMilSeconds
             let delta = 0
